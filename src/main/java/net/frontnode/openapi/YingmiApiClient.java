@@ -51,13 +51,10 @@ public class YingmiApiClient {
     private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
 
     private String host;
-
+    private int	port = 443;
     private String apiKey;
-
     private String apiSecret;
-
     private HttpClient httpClient;
-    
     final private String keyStoreType;
     final private String keyStorePath;
     final private String keyStorePassword;
@@ -82,7 +79,12 @@ public class YingmiApiClient {
     }
 
 	public YingmiApiClient(String host, String apiKey, String apiSecret, String keyStoreType, String keyStorePath, String keyStorePassword ) {
+		this(host,443,apiKey,apiSecret,keyStoreType,keyStorePath,keyStorePassword,null );
+	}
+
+	public YingmiApiClient(String host, int port, String apiKey, String apiSecret, String keyStoreType, String keyStorePath, String keyStorePassword, String protocol ) {
         this.host = host;
+        this.port = port;
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
         this.keyStoreType = keyStoreType;
@@ -105,7 +107,7 @@ public class YingmiApiClient {
         
             SSLConnectionSocketFactory sf = new SSLConnectionSocketFactory(
                     context,
-                    new String[] {"TLSv1.2"},
+                    protocol == null ? new String[] { "TLSv1.2","TLSv1.1","TLSv1" } : new String[] {protocol},
                     null,
                     SSLConnectionSocketFactory.getDefaultHostnameVerifier());
 
@@ -148,7 +150,8 @@ public class YingmiApiClient {
     String get(String path, Map<String, String> params) {
         String basePath = "/v1";
         URIBuilder builder = new URIBuilder().setScheme("https")
-                .setHost(host)
+                .setHost(this.host)
+                .setPort(this.port)
                 .setPath(basePath + path);
 
         addRequiredParams("GET", path, params, apiKey, apiSecret);

@@ -21,6 +21,8 @@ public class MainApp {
 
         Options options = new Options();
         options.addOption("host", true, "yingmi openapi host name");
+        options.addOption("port", true, "port number (default 443)");
+        options.addOption("sslv3", false, "force SSLv3 (default TLSv1.2/1.1)");
         options.addOption("key", true, "api key");
         options.addOption("secret", true, "api secret");
         options.addOption("keytype",true,"keystore type, use -Djavax.net.ssl.keyStoreType if absent, falls back to 'jks'");
@@ -58,14 +60,18 @@ public class MainApp {
         params.put("keytype", commandLine.getOptionValue("keytype",System.getProperty("javax.net.ssl.keyStoreType","jks")));
         params.put("keystore", commandLine.getOptionValue("keystore",System.getProperty("javax.net.ssl.keyStore")));
         params.put("keypass", commandLine.getOptionValue("keypass",System.getProperty("javax.net.ssl.keyStorePassword")) );
-        
+        params.put("port", commandLine.getOptionValue("port","443"));
+        params.put("protocol",commandLine.hasOption("sslv3")? "SSLv3":null);
+
         YingmiApiClient ac = new YingmiApiClient(
                 params.get("host"),
+                Integer.parseInt( params.get("port") ),
                 params.get("key"),
                 params.get("secret"),
                 params.get("keytype"),
                 params.get("keystore"),
-                params.get("keypass")
+                params.get("keypass"),
+                params.get("protocol")
                 );
         
         // invoke the api
