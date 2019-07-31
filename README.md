@@ -24,7 +24,7 @@
 * yingmi-openapi-root-ca.crt － 盈米openapi的根证书，用于接口客户端验证盈米的服务器
 * openapi-[环境]-cert-[商户号].crt － PEM格式的客户端证书文件，用于盈米服务器验证客户端 (Java 应用不使用 )
 * openapi-[环境]-cert-[商户号].key － PEM格式的客户端证书文件的私钥文件 (Java 应用不使用)
-* openapi-[环境]-cert-[商户号].p12 － PKCS12 格式的客户端证书文件(含私钥), 默认密码为 “123456”
+* openapi-[环境]-cert-[商户号].p12 － PKCS12 格式的客户端证书文件(含私钥)
 
 其中“环境”可能是`test`或者`prod`分别对应测试环境和生产环境。商户名是唯一的商户名称。（下文举例使用`test`，商户名用`0000`）.
 
@@ -46,11 +46,6 @@ keytool -import -keystore ~/cacerts -file yingmi-openapi-root-ca.crt -alias ying
 
 ### 方式3 直接使用盈米提供的已经包含了 JRE 默认信任的公开CA证书以及盈米OpenAPI 开发/生产环境CA证书的  cacerts 文件
 
-### 备注
-
-由于历史原因, 盈米 OpenAPI 开发环境 https://api-test.frontnode.net 使用了盈米自签发的服务器证书, 该自签发证书将被废弃, 与生产环境一样使用由公开的证书签发机构(StartCOM Certificate Authority SHA256)签发的服务器证书。为了便于平滑过渡, 我们提供了两个证书的 PEM 格式文件, 建议都导入到 cacerts 文件中.
-
-由于StartCOM CA证书尚未被 Oracle 纳入Java默认受信任的证书库 $JAVA_HOME/jre/lib/security/cacerts 中, 因此需要将该证书导入到应用信任的cacerts 证书库中.
 
 
 # 2. 使用apiKey和apiSecret
@@ -105,9 +100,9 @@ String getSig(String method, String path, String apiSecret, Map<String, String> 
 假设
 
 * 客户端证书的路径为 "openapi-test-cert-0000.p12"
-* 客户端证书的密码为 "123456"
+* 客户端证书的密码为 "xxxxxx"
 * truststore路径为 "cacerts"
-* truststore密码为 "changeit"
+* truststore密码为 "yyyyyy"
 * api key为abcdefg
 * api secret为ABCDEFG
 
@@ -119,10 +114,10 @@ cd openapi-client-java
 mvn clean package
 java \
 	-Djavax.net.ssl.trustStore=cacerts \
-	-Djavax.net.ssl.trustStorePassword=changeit \
+	-Djavax.net.ssl.trustStorePassword=yyyyyy \
 	-Djavax.net.ssl.keyStoreType=pkcs12 \
 	-Djavax.net.ssl.keyStore=openapi-test-cert-0000.p12 \
-	-Djavax.net.ssl.keyStorePassword=123456 \
+	-Djavax.net.ssl.keyStorePassword=xxxxxx \
     -jar target/openapi-client-1.0-SNAPSHOT-jar-with-dependencies.jar \
     -host api-test.frontnode.net \
     -key abcefg \
@@ -135,10 +130,10 @@ java \
 ```
 java \
 	-Djavax.net.ssl.trustStore=cacerts \
-	-Djavax.net.ssl.trustStorePassword=changeit \
+	-Djavax.net.ssl.trustStorePassword=yyyyyy \
 	-Djavax.net.ssl.keyStoreType=pkcs12 \
 	-Djavax.net.ssl.keyStore=openapi-prod-cert-0000.p12 \
-	-Djavax.net.ssl.keyStorePassword=123456 \
+	-Djavax.net.ssl.keyStorePassword=xxxxxx \
 	-jar target/openapi-client-1.0-SNAPSHOT-jar-with-dependencies.jar \
     -host api.yingmi.cn \
     -key abcefg \
